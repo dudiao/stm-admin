@@ -1,9 +1,6 @@
 package com.github.dudiao.stm.admin.model;
 
 import com.github.dudiao.stm.admin.base.BaseEntity;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.erupt.annotation.Erupt;
@@ -14,6 +11,10 @@ import xyz.erupt.annotation.sub_field.EditType;
 import xyz.erupt.annotation.sub_field.View;
 import xyz.erupt.annotation.sub_field.sub_edit.ChoiceType;
 import xyz.erupt.annotation.sub_field.sub_edit.Search;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * @author songyinyin
@@ -32,6 +33,9 @@ public class StmAppVersion extends BaseEntity {
   )
   @Column(length = AnnotationConst.CODE_LENGTH)
   private String version;
+
+  @EruptField(edit = @Edit(title = "版本号数字", desc = "用来比较版本号的大小，数字越大，版本越高（越新）", notNull = true))
+  private Long versionNum = 0L;
 
   @EruptField(
       views = @View(title = "状态", sortable = true),

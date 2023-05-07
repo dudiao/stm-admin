@@ -17,6 +17,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 import java.util.Set;
 
@@ -55,6 +56,12 @@ public class StmApp extends BaseEntity {
     private String appType;
 
     @EruptField(
+        views = @View(title = "需要的应用版本", desc = "比如Java应用，需要的 jre 最低 17", sortable = true),
+        edit = @Edit(title = "需要的应用版本", desc = "比如Java应用，需要的 jre 最低 17", notNull = true)
+    )
+    private Long requiredAppTypeVersionNum = 0L;
+
+    @EruptField(
         views = @View(title = "状态", sortable = true),
         edit = @Edit(
             title = "状态",
@@ -78,6 +85,7 @@ public class StmApp extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "stm_app_id")
+    @OrderBy("versionNum desc")
     @EruptField(
         edit = @Edit(title = "应用版本记录", type = EditType.TAB_TABLE_ADD)
     )
