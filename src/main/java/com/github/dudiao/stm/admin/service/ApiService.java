@@ -29,13 +29,17 @@ public class ApiService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private static final String APP_ORDER_BY = " order by weight asc, createTime desc";
-    private static final String APP_SELECT = "select new map(a.id as id, a.name as name, a.author as author, a.appType as appType, a.status as status, a.description as description) from StmApp a";
+    private static final String APP_ORDER_BY = " order by a.weight asc, a.createTime desc";
+    private static final String APP_SELECT = """
+    select new map(a.id as id, a.name as name, a.author as author, a.appType as appType, a.status as status, 
+    max(av.version) as version, 
+    a.requiredAppTypeVersionNum as requiredAppTypeVersionNum, a.description as description) from StmApp a left join a.appVersions av
+    """;
 
     public List<Map<String, Object>> appList(String name) {
         Query query;
         if (StrUtil.isNotBlank(name)) {
-            query = entityManager.createQuery(APP_SELECT + " where name like :name" + APP_ORDER_BY)
+            query = entityManager.createQuery(APP_SELECT + " where a.name like :name" + APP_ORDER_BY)
                 .setParameter("name", "%" + name + "%");
         } else {
             query = entityManager.createQuery(APP_SELECT + APP_ORDER_BY);
