@@ -34,9 +34,9 @@ public class ApiController {
      * 获取应用的最新版本信息
      */
     @GetMapping("/latestVersion")
-    public Result latestVersion(@RequestParam String appId,
+    public Result latestVersion(@RequestParam String appName,
                                 @RequestParam(required = false) String version) {
-        return Result.ok(apiService.latestVersion(appId, version));
+        return Result.ok(apiService.latestVersion(appName, version));
     }
 
     /**

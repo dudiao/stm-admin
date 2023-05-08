@@ -1,8 +1,11 @@
 package com.github.dudiao.stm.admin.service;
 
 import cn.hutool.core.util.StrUtil;
+import com.github.dudiao.stm.admin.base.BusinessException;
+import com.github.dudiao.stm.admin.model.StmApp;
 import com.github.dudiao.stm.admin.model.StmAppType;
 import com.github.dudiao.stm.admin.model.StmAppVersion;
+import com.github.dudiao.stm.admin.repository.StmAppRepository;
 import com.github.dudiao.stm.admin.utils.MapBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,9 @@ public class ApiService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Autowired
+    private StmAppRepository stmAppRepository;
+
     private static final String APP_ORDER_BY = " order by a.weight asc, a.createTime desc";
     private static final String APP_SELECT = """
     select new map(a.id as id, a.name as name, a.author as author, a.appType as appType, a.status as status, 
@@ -49,13 +55,18 @@ public class ApiService {
         return query.getResultList();
     }
 
-    public StmAppVersion latestVersion(String appId, String version) {
+    public StmAppVersion latestVersion(String appName, String version) {
+
+        StmApp stmApp = stmAppRepository.findByName(appName);
+        if (stmApp == null) {
+            throw new BusinessException("应用不存在");
+        }
 
         if (StrUtil.isBlank(version)) {
-            return eruptDao.queryEntity(StmAppVersion.class, "stm_app_id = :appId order by versionNum desc", MapBuilder.of("appId", appId));
+            return eruptDao.queryEntity(StmAppVersion.class, "stm_app_id = :appId order by versionNum desc", MapBuilder.of("appId", stmApp.getId()));
         }
         return eruptDao.queryEntity(StmAppVersion.class, "stm_app_id = :appId and version = :version",
-            MapBuilder.of("appId", appId, "version", version));
+            MapBuilder.of("appId", stmApp.getId(), "version", version));
 
     }
 
