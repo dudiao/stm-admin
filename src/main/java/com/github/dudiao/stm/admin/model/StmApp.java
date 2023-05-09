@@ -19,7 +19,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
-import java.util.Set;
+import javax.persistence.Transient;
+import java.util.List;
 
 /**
  * @author songyinyin
@@ -89,6 +90,9 @@ public class StmApp extends BaseEntity {
     @EruptField(
         edit = @Edit(title = "应用版本记录", type = EditType.TAB_TABLE_ADD)
     )
-    private Set<StmAppVersion> appVersions;
+    private List<StmAppVersion> appVersions;
+
+    @Transient
+    private StmAppVersion appLatestVersion;
 
 }

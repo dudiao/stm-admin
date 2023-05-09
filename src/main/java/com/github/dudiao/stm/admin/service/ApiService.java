@@ -37,10 +37,10 @@ public class ApiService {
 
     private static final String APP_ORDER_BY = " order by a.weight asc, a.createTime desc";
     private static final String APP_SELECT = """
-    select new map(a.id as id, a.name as name, a.author as author, a.appType as appType, a.status as status, 
-    max(av.version) as version, 
-    a.requiredAppTypeVersionNum as requiredAppTypeVersionNum, a.description as description) from StmApp a left join a.appVersions av
-    """;
+        select new map(a.id as id, a.name as name, a.author as author, a.appType as appType, a.status as status, 
+        max(av.version) as version, 
+        a.requiredAppTypeVersionNum as requiredAppTypeVersionNum, a.description as description) from StmApp a left join a.appVersions av
+        """;
 
     public List<Map<String, Object>> appList(String name) {
         Query query;
@@ -55,19 +55,27 @@ public class ApiService {
         return query.getResultList();
     }
 
-    public StmAppVersion latestVersion(String appName, String version) {
+    public StmApp latestVersion(String appName, String version) {
 
         StmApp stmApp = stmAppRepository.findByName(appName);
         if (stmApp == null) {
             throw new BusinessException("应用不存在");
         }
 
+        StmAppVersion stmAppVersion;
         if (StrUtil.isBlank(version)) {
-            return eruptDao.queryEntity(StmAppVersion.class, "stm_app_id = :appId order by versionNum desc", MapBuilder.of("appId", stmApp.getId()));
+            stmAppVersion = stmApp.getAppVersions().get(0);
+        } else {
+            stmAppVersion = eruptDao.queryEntity(StmAppVersion.class, "stm_app_id = :appId and version = :version",
+                MapBuilder.of("appId", stmApp.getId(), "version", version));
         }
-        return eruptDao.queryEntity(StmAppVersion.class, "stm_app_id = :appId and version = :version",
-            MapBuilder.of("appId", stmApp.getId(), "version", version));
+        if (stmAppVersion == null) {
+            throw new BusinessException("应用版本不存在");
+        }
 
+        stmApp.setAppVersions(null);
+        stmApp.setAppLatestVersion(stmAppVersion);
+        return stmApp;
     }
 
     public List<String> getAppRuntimeSdkUrls(String appType, Long appTypeVersion, String osName, String osArch) {
