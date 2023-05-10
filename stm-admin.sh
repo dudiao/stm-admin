@@ -41,14 +41,15 @@ stop() {
 
 appIsStartSuccessful() {
   count=0
+  sleepTime=2
   PID=$(netstat -ntpl | grep "$appPort" | awk '{print $7}' | sed -n '1p' | cut -d/ -f 1)
   while [ -z "$PID" ]; do
     if ((count == 15)); then
-      echo "$NATIVE_PATH:$(expr $count \* 2)秒内未启动,请检查：tail -f logs/stm-admin.log"
+      echo "$NATIVE_PATH:$(expr $count \* $sleepTime)秒内未启动,请检查：tail -f logs/stm-admin.log"
       break
     fi
     count=$((count + 1))
-    echo "$NATIVE_PATH:启动中..................$(expr $count \* 10 - 10)秒"
+    echo "$NATIVE_PATH:启动中..................$(expr $count \* $sleepTime - $sleepTime)秒"
     sleep 2s
     PID=$(netstat -ntpl | grep "$appPort" | awk '{print $7}' | sed -n '1p' | cut -d/ -f 1)
   done
