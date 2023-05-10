@@ -7,7 +7,10 @@ import com.github.dudiao.stm.admin.model.StmAppType;
 import com.github.dudiao.stm.admin.model.StmAppVersion;
 import com.github.dudiao.stm.admin.repository.StmAppRepository;
 import com.github.dudiao.stm.admin.utils.MapBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import xyz.erupt.jpa.dao.EruptDao;
 
@@ -23,6 +26,7 @@ import java.util.stream.Collectors;
  * @author songyinyin
  * @since 2023/5/4 15:37
  */
+@Slf4j
 @Service
 public class ApiService {
 
@@ -42,6 +46,7 @@ public class ApiService {
         a.requiredAppTypeVersionNum as requiredAppTypeVersionNum, a.description as description) from StmApp a left join a.appVersions av
         """;
 
+    @Cacheable(value = "appList", unless = "#result.size() == 0", key = "#name")
     public List<Map<String, Object>> appList(String name) {
         Query query;
         if (StrUtil.isNotBlank(name)) {
@@ -55,6 +60,7 @@ public class ApiService {
         return query.getResultList();
     }
 
+    @Cacheable(value = "latestVersion", key = "#appName + '::' + #version")
     public StmApp latestVersion(String appName, String version) {
 
         StmApp stmApp = stmAppRepository.findByName(appName);
@@ -78,6 +84,7 @@ public class ApiService {
         return stmApp;
     }
 
+    @Cacheable(value = "getAppRuntimeSdkUrls", key = "#appType + '::' + #appTypeVersion + '::' + #osName + '_' + #osArch")
     public List<String> getAppRuntimeSdkUrls(String appType, Long appTypeVersion, String osName, String osArch) {
         String expr = "appType = :appType and appTypeVersionNum = :appTypeVersionNum and osName = :osName and osArch = :osArch";
         Map<String, Object> map = new HashMap<>();
@@ -100,6 +107,16 @@ public class ApiService {
         } else {
             return "other";
         }
+    }
+
+    @CacheEvict(value = {"appList", "latestVersion"}, allEntries = true)
+    public void appCacheClear() {
+        log.info("stmApp and stmAppVersion cache clear");
+    }
+
+    @CacheEvict(value = {"getAppRuntimeSdkUrls"}, allEntries = true)
+    public void runtimeCacheClear() {
+        log.info("stmAppType cache clear");
     }
 
 }

@@ -1,6 +1,7 @@
 package com.github.dudiao.stm.admin.model;
 
 import com.github.dudiao.stm.admin.base.BaseEntity;
+import com.github.dudiao.stm.admin.dataproxy.StmAppDataProxy;
 import lombok.Getter;
 import lombok.Setter;
 import xyz.erupt.annotation.Erupt;
@@ -29,7 +30,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Erupt(name = "STM应用", orderBy = "createTime desc")
+@Erupt(name = "STM应用", orderBy = "createTime desc", dataProxy = StmAppDataProxy.class)
 @Table(name = "stm_app")
 public class StmApp extends BaseEntity {
 

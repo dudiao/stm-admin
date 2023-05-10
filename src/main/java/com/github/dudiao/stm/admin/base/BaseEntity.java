@@ -19,6 +19,7 @@ import xyz.erupt.annotation.sub_field.Readonly;
 import xyz.erupt.annotation.sub_field.View;
 import xyz.erupt.annotation.sub_field.sub_edit.DateType;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +32,7 @@ import java.util.Map;
 @Setter
 @MappedSuperclass
 @PreDataProxy(BaseDataProxy.class)
-public class BaseEntity {
+public class BaseEntity implements Serializable {
 
   @Id
   @GeneratedValue(generator = "snowflakeGenerationId")
