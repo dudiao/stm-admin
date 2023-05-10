@@ -46,7 +46,7 @@ public class ApiService {
         a.requiredAppTypeVersionNum as requiredAppTypeVersionNum, a.description as description) from StmApp a left join a.appVersions av
         """;
 
-    @Cacheable(value = "appList", unless = "#result.size() == 0", key = "#name")
+    @Cacheable(value = "appList", unless = "#result.size() == 0", key = "#name == null ? '_all' : #name")
     public List<Map<String, Object>> appList(String name) {
         Query query;
         if (StrUtil.isNotBlank(name)) {
