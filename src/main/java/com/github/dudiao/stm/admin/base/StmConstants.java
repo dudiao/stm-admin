@@ -6,5 +6,5 @@ package com.github.dudiao.stm.admin.base;
  */
 public interface StmConstants {
 
-    String API_PATH = "/stm-api";
+    String API_PATH = "/apprunner-api";
 }
